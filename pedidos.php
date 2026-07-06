@@ -99,6 +99,38 @@ $status_color = ['pendente'=>'#fef3c7;color:#92400e','pago'=>'#dcfce7;color:#166
         </div>
         <div class="pedido-body" id="body-<?php echo $ped['id']; ?>">
             <?php
+            // Timeline de status
+            $tl_steps = ['pendente'=>'Recebido','pago'=>'Pago','enviado'=>'Enviado','entregue'=>'Entregue'];
+            $tl_order = array_keys($tl_steps);
+            $tl_cur   = array_search($s, $tl_order);
+            if ($tl_cur === false) $tl_cur = 0;
+            if ($s !== 'cancelado'):
+            ?>
+            <div style="display:flex;align-items:flex-start;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid #E8DCC8;">
+              <?php foreach ($tl_steps as $tk=>$tv):
+                $ti    = array_search($tk,$tl_order);
+                $tdone = $ti <= $tl_cur;
+                $tact  = $ti === $tl_cur;
+              ?>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;">
+                <?php if ($ti > 0): ?>
+                <div style="position:absolute;top:13px;right:50%;width:100%;height:2px;background:<?php echo $tdone?'#2C4A2E':'#E5DED4'; ?>;z-index:0;"></div>
+                <?php endif; ?>
+                <div style="width:26px;height:26px;border-radius:50%;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:<?php echo $tdone?'#2C4A2E':'#F5F2ED'; ?>;border:2px solid <?php echo $tdone?'#2C4A2E':'#E5DED4'; ?>;<?php echo $tact?'box-shadow:0 0 0 3px rgba(44,74,46,.15);':''; ?>">
+                  <?php if ($tdone): ?><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  <?php else: ?><div style="width:7px;height:7px;border-radius:50%;background:#D0C8BE;"></div><?php endif; ?>
+                </div>
+                <div style="font-size:10px;font-weight:<?php echo $tact?'700':'500'; ?>;color:<?php echo $tdone?'#1C1208':'#9E9080'; ?>;text-align:center;"><?php echo $tv; ?></div>
+              </div>
+              <?php endforeach; ?>
+            </div>
+            <?php elseif ($s === 'cancelado'): ?>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 14px;background:#FEF2F2;border-radius:9px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <span style="font-size:12px;font-weight:600;color:#991b1b;">Pedido cancelado</span>
+            </div>
+            <?php endif; ?>
+            <?php
             $si2 = mysqli_prepare($conexao,
                 "SELECT i.*, p.nome, p.imagem FROM pedido_itens i
                  LEFT JOIN produtos p ON p.id = i.produto_id

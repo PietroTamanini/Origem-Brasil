@@ -6,19 +6,25 @@ if (!isset($_SESSION['id']) || $_SESSION['tipo'] !== 'admin') { header("Location
 
 $cats = mysqli_fetch_all(mysqli_query($conexao,
     "SELECT c.slug AS categoria,
-            COALESCE(p.total,0) AS total,
-            COALESCE(p.estoque_total,0) AS estoque_total,
-            COALESCE(p.preco_medio,0) AS preco_medio,
-            COALESCE(p.em_destaque,0) AS em_destaque,
-            COALESCE(p.sem_estoque,0) AS sem_estoque,
-            c.label AS label_db
+        COALESCE(p.total,0) AS total,
+        COALESCE(p.estoque_total,0) AS estoque_total,
+        COALESCE(p.preco_medio,0) AS preco_medio,
+        COALESCE(p.em_destaque,0) AS em_destaque,
+        COALESCE(p.sem_estoque,0) AS sem_estoque,
+        p.imagem,
+        c.label AS label_db
      FROM categorias c
      LEFT JOIN (
-        SELECT categoria, COUNT(*) AS total, COALESCE(SUM(estoque),0) AS estoque_total,
-               COALESCE(AVG(preco),0) AS preco_medio,
-               SUM(CASE WHEN destaque=1 THEN 1 ELSE 0 END) AS em_destaque,
-               SUM(CASE WHEN estoque=0 THEN 1 ELSE 0 END) AS sem_estoque
-        FROM produtos GROUP BY categoria
+        SELECT
+    categoria,
+    COUNT(*) AS total,
+    COALESCE(SUM(estoque),0) AS estoque_total,
+    COALESCE(AVG(preco),0) AS preco_medio,
+    SUM(CASE WHEN destaque=1 THEN 1 ELSE 0 END) AS em_destaque,
+    SUM(CASE WHEN estoque=0 THEN 1 ELSE 0 END) AS sem_estoque,
+    MIN(imagem) AS imagem
+FROM produtos
+GROUP BY categoria
      ) p ON p.categoria = c.slug
      ORDER BY total DESC"
 ), MYSQLI_ASSOC);
@@ -39,9 +45,16 @@ include('layout.php');
 ?>
 <div class="card" style="padding:24px;">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-        <div style="width:44px;height:44px;border-radius:12px;background:<?php echo $info['cor']; ?>20;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">
-            <?php echo $info['emoji']; ?>
-        </div>
+       <div style="width:60px;height:60px;border-radius:12px;overflow:hidden;flex-shrink:0;background:#f3f3f3;">
+    <?php if(!empty($c['imagem'])): ?>
+        <img
+            src="../<?php echo htmlspecialchars($c['imagem']); ?>"
+            alt="<?php echo htmlspecialchars($info['label']); ?>"
+            style="width:100%;height:100%;object-fit:cover;">
+    <?php else: ?>
+        <?php echo $info['emoji']; ?>
+    <?php endif; ?>
+</div>
         <div>
             <div style="font-size:15px;font-weight:700;"><?php echo $info['label']; ?></div>
             <div style="font-size:11px;color:var(--text-3);font-family:monospace;"><?php echo $c['categoria']; ?></div>

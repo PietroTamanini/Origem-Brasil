@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 $host    = "localhost";
 $usuario = "root";
 $senha   = "";
-$banco   = "br";
+$banco   = "ORIGEM";
 
 $conexao = mysqli_connect($host, $usuario, $senha, $banco);
 

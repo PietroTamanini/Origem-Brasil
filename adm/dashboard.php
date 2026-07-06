@@ -20,6 +20,40 @@ $n_sol_prd       = (int)mysqli_fetch_assoc(mysqli_query($conexao,"SELECT COUNT(*
 // ticket médio
 $ticket = $total_pedidos > 0 ? $total_vendas / $total_pedidos : 0;
 
+// ── TENDÊNCIAS (vs mês anterior) ──
+$mes_ant_y  = date('Y', strtotime('-1 month'));
+$mes_ant_m  = date('m', strtotime('-1 month'));
+$vendas_ant = (float)mysqli_fetch_assoc(mysqli_query($conexao,
+    "SELECT COALESCE(SUM(total),0) n FROM pedidos
+     WHERE YEAR(data_pedido)=$mes_ant_y AND MONTH(data_pedido)=$mes_ant_m AND status NOT IN('cancelado')"))['n'];
+$pedidos_ant = (int)mysqli_fetch_assoc(mysqli_query($conexao,
+    "SELECT COUNT(*) n FROM pedidos
+     WHERE YEAR(data_pedido)=$mes_ant_y AND MONTH(data_pedido)=$mes_ant_m"))['n'];
+$mes_atual_y = date('Y'); $mes_atual_m = date('m');
+$vendas_mes  = (float)mysqli_fetch_assoc(mysqli_query($conexao,
+    "SELECT COALESCE(SUM(total),0) n FROM pedidos
+     WHERE YEAR(data_pedido)=$mes_atual_y AND MONTH(data_pedido)=$mes_atual_m AND status NOT IN('cancelado')"))['n'];
+$pedidos_mes = (int)mysqli_fetch_assoc(mysqli_query($conexao,
+    "SELECT COUNT(*) n FROM pedidos
+     WHERE YEAR(data_pedido)=$mes_atual_y AND MONTH(data_pedido)=$mes_atual_m"))['n'];
+function trend($atual, $ant) {
+    if ($ant == 0) return ['', 0];
+    $pct = round(($atual - $ant) / $ant * 100);
+    $arrow = $pct >= 0 ? '↑' : '↓';
+    $color = $pct >= 0 ? '#16a34a' : '#dc2626';
+    return ["<span style='font-size:11px;font-weight:700;color:$color;margin-left:6px;'>$arrow ".abs($pct)."%</span>", $pct];
+}
+[$trend_vendas]  = trend($vendas_mes,  $vendas_ant);
+[$trend_pedidos] = trend($pedidos_mes, $pedidos_ant);
+
+$hora = (int)date('H');
+$saudacao = $hora < 12 ? 'Bom dia' : ($hora < 18 ? 'Boa tarde' : 'Boa noite');
+$primeiro_nome = explode(' ', $_SESSION['nome'])[0];
+$data_pt = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+$meses_pt = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+$data_fmt = $data_pt[date('w')].", ".date('d')." de ".$meses_pt[(int)date('m')]." de ".date('Y');
+
+
 // ── VENDAS POR MÊS (últimos 7 meses) ──
 $meses_labels = [];
 $meses_vals   = [];
@@ -69,23 +103,51 @@ $status_counts = mysqli_fetch_all(mysqli_query($conexao,
 $sc = [];
 foreach ($status_counts as $s) $sc[$s['status']] = $s['n'];
 
-$topbar_action = '<a href="produtos.php" class="topbar-btn primary">+ Novo Produto</a>';
+$topbar_action = '<a href="produtos.php?acao=novo" class="topbar-btn primary" style="display:inline-flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Produto</a>';
 include('layout.php');
 $status_label = ['pendente'=>'Pendente','pago'=>'Pago','enviado'=>'Enviado','entregue'=>'Entregue','cancelado'=>'Cancelado'];
 ?>
+
+<!-- GREETING BANNER -->
+<div style="background:linear-gradient(110deg,var(--soil) 0%,#2C4A2E 100%);border-radius:14px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;overflow:hidden;position:relative;">
+  <div style="position:absolute;right:-30px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.03);"></div>
+  <div>
+    <div style="font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;"><?php echo $data_fmt; ?></div>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;"><?php echo $saudacao ?>, <?php echo htmlspecialchars($primeiro_nome); ?> 👋</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px;">
+      <?php if ($n_sol_prod+$n_sol_prd > 0): ?>
+        Você tem <strong style="color:#F59E0B;"><?php echo $n_sol_prod+$n_sol_prd; ?> solicitação(ões)</strong> aguardando revisão.
+      <?php elseif ($sem_estoque > 0): ?>
+        <strong style="color:#F59E0B;"><?php echo $sem_estoque; ?> produto(s)</strong> sem estoque — vale dar uma olhada.
+      <?php else: ?>
+        Tudo em ordem. Bom trabalho!
+      <?php endif; ?>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap;">
+    <a href="produtos.php?acao=novo" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--clay);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;transition:background .15s;" onmouseover="this.style.background='#b04319'" onmouseout="this.style.background='var(--clay)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Produto
+    </a>
+    <?php if ($n_sol_prod+$n_sol_prd > 0): ?>
+    <a href="sol_produtores.php" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:rgba(255,255,255,.1);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.15);">
+      Ver Solicitações <span style="background:var(--clay);border-radius:10px;padding:1px 6px;font-size:10px;"><?php echo $n_sol_prod+$n_sol_prd; ?></span>
+    </a>
+    <?php endif; ?>
+  </div>
+</div>
 
 <!-- MÉTRICAS -->
 <div class="metrics">
     <div class="metric green">
         <div class="m-icon"><svg style="width:1em;height:1em;vertical-align:middle;display:inline-block;stroke:currentColor;fill:none;stroke-width:2;" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <div class="m-label">Receita Total</div>
-        <div class="m-val" style="font-size:20px;">R$ <?php echo number_format($total_vendas,2,',','.'); ?></div>
+        <div class="m-val" style="font-size:20px;">R$ <?php echo number_format($total_vendas,2,',','.'); ?><?php echo $trend_vendas; ?></div>
         <div class="m-sub">pedidos confirmados</div>
     </div>
     <div class="metric blue">
         <div class="m-icon"><svg style="width:1em;height:1em;vertical-align:middle;display:inline-block;stroke:currentColor;fill:none;stroke-width:2;" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
         <div class="m-label">Pedidos</div>
-        <div class="m-val"><?php echo $total_pedidos; ?></div>
+        <div class="m-val"><?php echo $total_pedidos; ?><?php echo $trend_pedidos; ?></div>
         <div class="m-sub">ticket médio R$ <?php echo number_format($ticket,2,',','.'); ?></div>
     </div>
     <div class="metric green">

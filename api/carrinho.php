@@ -16,9 +16,11 @@ switch ($action) {
     case 'listar':
         $stmt = mysqli_prepare($conexao,
             "SELECT c.id, c.produto_id, c.quantidade,
-                    p.nome, p.preco, p.imagem, p.estoque
+                    p.nome, p.preco, p.imagem, p.estoque,
+                    COALESCE(pr.nome, 'Produtor') AS produtor_nome
              FROM carrinho c
              JOIN produtos p ON p.id = c.produto_id
+             LEFT JOIN produtores pr ON pr.id = p.produtor_id
              WHERE c.usuario_id = ?
              ORDER BY c.adicionado_em"
         );

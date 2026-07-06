@@ -185,10 +185,6 @@ if (isset($conexao)) {
             </div>
         </div>
 
-        <a href="produtores.php" <?php echo $paginaAtual==='produtores.php'?'class="nav-active"':''; ?>>
-            <?php echo icon('users'); ?> <span>Produtores</span>
-        </a>
-
         <a href="sobre.php" <?php echo $paginaAtual==='sobre.php'?'class="nav-active"':''; ?>>
             <?php echo icon('info'); ?> <span>Nossa História</span>
         </a>

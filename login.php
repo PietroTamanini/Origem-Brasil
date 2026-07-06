@@ -93,7 +93,7 @@ $voltar = htmlspecialchars($_GET['voltar'] ?? 'index.php');
                 <label>Senha</label>
                 <input type="password" name="senha" placeholder="••••••••" required>
             </div>
-            <a href="esquece.php" class="forgot">Esqueceu a senha?</a>
+            <a href="recuperar-senha/esquece.php" class="forgot">Esqueceu a senha?</a>
             <button type="submit" class="btn-login">Entrar</button>
         </form>
 

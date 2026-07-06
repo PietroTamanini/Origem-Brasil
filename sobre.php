@@ -398,6 +398,10 @@
         </div>
 
         <p>Nossa equipe percorre o Brasil em busca de pequenos produtores extraordinários: cafés especiais do Cerrado Mineiro, granolas do Planalto Central, cereais orgânicos do Sul. Produtos com alma, com propósito, com sabor que você não esquece.</p>
+        <a href="produtores.php" style="display:inline-flex;align-items:center;gap:7px;margin-top:18px;font-size:13px;font-weight:600;color:#2C4A2E;border-bottom:1px solid rgba(44,74,46,.3);padding-bottom:2px;text-decoration:none;transition:color .15s;">
+            Conheça nossos produtores parceiros
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
     </div>
 
     <!-- VALORES -->
