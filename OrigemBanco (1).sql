@@ -157,11 +157,13 @@ CREATE TABLE IF NOT EXISTS favoritos (
 -- =============================================
 -- Usuário admin padrão  (senha: admin123)
 -- =============================================
-INSERT IGNORE INTO usuarios (nome, email, senha, tipo) VALUES
+INSERT INTO usuarios (nome, email, senha, tipo) VALUES
 ('Administrador', 'admin@origembrasil.com',
- '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uHwHWn36G', 'admin');
--- Hash já atualizado (equivalente ao 2º UPDATE que existia no arquivo antigo)
-
+ '$2y$10$jSLbNdPGh0cI8wi4wyvgr.dcGPxlHwLspP4WIsaeDq8O9L6i70Bse', 'admin')
+ON DUPLICATE KEY UPDATE
+    nome = VALUES(nome),
+    senha = VALUES(senha),
+    tipo = VALUES(tipo);
 -- =============================================
 -- Produtores de exemplo
 -- =============================================
