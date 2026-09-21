@@ -102,18 +102,22 @@ async function renderCart() {
         updateCartCount(0); return;
     }
 
-    // Skeleton
-    container.innerHTML = `<div style="padding:16px;display:flex;flex-direction:column;gap:16px;">
-        ${[1,2].map(()=>`<div style="display:flex;gap:12px;">
-            <div class="skeleton" style="width:54px;height:54px;border-radius:10px;flex-shrink:0;"></div>
-            <div style="flex:1;"><div class="skeleton" style="height:12px;width:75%;margin-bottom:8px;"></div><div class="skeleton" style="height:10px;width:45%;"></div></div>
-        </div>`).join('')}
-    </div>`;
+    // Mostra loading somente na primeira abertura. Em alteracoes de quantidade,
+    // manter a lista atual evita piscadas e saltos visuais no HUD.
+    if (!container.dataset.loaded) {
+        container.innerHTML = `<div style="padding:16px;display:flex;flex-direction:column;gap:16px;">
+            ${[1,2].map(()=>`<div style="display:flex;gap:12px;">
+                <div class="skeleton" style="width:54px;height:54px;border-radius:10px;flex-shrink:0;"></div>
+                <div style="flex:1;"><div class="skeleton" style="height:12px;width:75%;margin-bottom:8px;"></div><div class="skeleton" style="height:10px;width:45%;"></div></div>
+            </div>`).join('')}
+        </div>`;
+    }
 
     const itens = await apiGet('listar');
     if (!itens) return;
 
     if (itens.length === 0) {
+        container.dataset.loaded = '1';
         container.innerHTML = `<div class="cart-empty">
             <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:28px;height:28px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
             <p>Seu carrinho está vazio</p>
@@ -126,6 +130,7 @@ async function renderCart() {
     }
 
     let total = 0;
+    container.dataset.loaded = '1';
     container.innerHTML = itens.map(item => {
         const sub = item.preco * item.quantidade;
         total += sub;
