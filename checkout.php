@@ -1,7 +1,7 @@
 <?php include("conexao.php");
 if (!isset($_SESSION['id'])) { header("Location: login.php?voltar=checkout.php"); exit; }
 $uid  = (int)$_SESSION['id'];
-$user = mysqli_fetch_assoc(mysqli_query($conexao,"SELECT nome,email,telefone,cpf FROM usuarios WHERE id=$uid"));
+$user = mysqli_fetch_assoc(mysqli_query($conexao,"SELECT nome,email,telefone FROM usuarios WHERE id=$uid"));
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
