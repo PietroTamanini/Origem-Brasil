@@ -1,5 +1,4 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include("conexao.php");
 if (!isset($_SESSION['id'])) { header("Location: login.php?voltar=perfil.php"); exit; }
 $uid = (int)$_SESSION['id'];
