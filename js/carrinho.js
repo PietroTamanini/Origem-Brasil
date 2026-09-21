@@ -155,7 +155,7 @@ async function renderCart() {
 }
 
 function updateCartCount(n) {
-    document.querySelectorAll('#cart-count').forEach(el => el.textContent = n || '0');
+    document.querySelectorAll('#cart-count, .cart-count').forEach(el => el.textContent = n || '0');
 }
 async function loadCartCount() {
     if (!estaLogado()) { updateCartCount(0); return; }
@@ -199,11 +199,11 @@ function closeCart() {
 // ── EVENTOS ───────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     // Carrinho
-    document.getElementById('open-cart')?.addEventListener('click', async () => {
+    document.querySelectorAll('[data-cart-toggle], #open-cart').forEach(btn => btn.addEventListener('click', async () => {
         document.getElementById('cart-sidebar')?.classList.add('active');
         document.getElementById('cart-overlay')?.classList.add('active');
         await renderCart();
-    });
+    }));
     document.getElementById('close-cart')?.addEventListener('click', closeCart);
     document.getElementById('cart-overlay')?.addEventListener('click', closeCart);
 
