@@ -1,3 +1,4 @@
 recuperar-senha/config_email.php
 .env
 tmp/
+.tools/
