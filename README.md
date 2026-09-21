@@ -2,6 +2,12 @@
 
 E-commerce em PHP e MySQL para venda de produtos brasileiros, com catalogo, produtores, carrinho, checkout, pedidos, favoritos, perfil de usuario e painel administrativo.
 
+## Documentacao
+
+Este README e a fonte oficial para instalar, configurar e rodar o projeto.
+
+Nao e necessario executar arquivos de migracao separados. O arquivo `OrigemBanco (1).sql` ja cria o banco `br` com a estrutura atual do sistema.
+
 ## Tecnologias
 
 - PHP 8+
