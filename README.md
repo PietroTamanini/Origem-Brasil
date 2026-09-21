@@ -66,10 +66,40 @@ br
 
 ### Opcao 1: importar pelo phpMyAdmin
 
-1. Acesse `http://localhost/phpmyadmin`.
-2. Clique em `Importar`.
-3. Escolha o arquivo `OrigemBanco (1).sql`.
-4. Clique em `Executar`.
+Use esta opcao se o Apache do XAMPP estiver abrindo normalmente no navegador.
+
+1. Abra o painel do XAMPP.
+2. Inicie `Apache` e `MySQL`.
+3. Clique no botao `Admin` do servico Apache para abrir o endereco correto no navegador.
+4. Acesse o phpMyAdmin pelo caminho `/phpmyadmin`.
+
+Exemplos de endereco:
+
+```text
+http://localhost/phpmyadmin
+http://localhost:8080/phpmyadmin
+```
+
+Se `localhost` nao abrir, use o endereco com a porta configurada no seu Apache. No XAMPP, essa porta aparece no painel ou no arquivo:
+
+```text
+C:\xampp\apache\conf\httpd.conf
+```
+
+Procure pela linha `Listen`. Exemplos:
+
+```text
+Listen 80
+Listen 8080
+```
+
+Dentro do phpMyAdmin:
+
+1. Clique em `Importar`.
+2. Escolha o arquivo `OrigemBanco (1).sql`.
+3. Clique em `Executar`.
+
+Nao e necessario criar o banco manualmente antes da importacao. O proprio SQL cria o banco `br`.
 
 ### Opcao 2: importar pelo terminal
 
@@ -270,4 +300,3 @@ Confira:
 - Nao versionar senhas reais de e-mail.
 - Ao alterar o banco, atualize tambem o arquivo SQL principal.
 - Sempre teste login, carrinho e checkout depois de mudancas em sessao ou banco.
-
